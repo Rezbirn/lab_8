@@ -23,7 +23,7 @@ namespace lab_8.Controllers
             var user = _db.Users.Where(x=>x.Id == id).FirstOrDefault();
             if (user is null)
                 return BadRequest();
-            return Ok(user.Name);
+            return Ok(user);
         }
 
         [HttpPost("login")]

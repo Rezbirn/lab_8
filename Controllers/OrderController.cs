@@ -20,7 +20,7 @@ namespace lab_8.Controllers
             _db = db;
         }
 
-        [HttpGet("order")]
+        [HttpGet("get")]
         public IActionResult GetOrder(int id) 
         {
             var order = _db.Orders.Where(x=>x.Id == id).Include(x => x.Orders).ThenInclude(x => x.Product).FirstOrDefault();
@@ -28,7 +28,7 @@ namespace lab_8.Controllers
                 return Ok(order);
             return NotFound();
         }
-        [HttpGet("orders")]
+        [HttpGet("gets")]
         public IActionResult GetOrders()
         {
             var orders = _db.Orders.Include(x=>x.Owner).Include(x=>x.Orders).ThenInclude(x=>x.Product).ToList();
@@ -71,6 +71,24 @@ namespace lab_8.Controllers
 
             return Ok();
         }
+
+        [HttpDelete("delete")]
+        public IActionResult DeleteOrder(int id)
+        {
+            var order = _db.Orders.Where(x => x.Id == id).Include(x => x.Orders).ThenInclude(x => x.Product).FirstOrDefault();
+            if (order is null)
+                return NotFound();
+
+            foreach (var item in order.Orders)
+            {
+                item.Product.Amount += item.Amount;
+            }
+
+            _db.Orders.Remove(order);
+            _db.SaveChanges();
+            return Ok();
+        }
+
         [HttpPut("changestatus")]
         public IActionResult ChangeStatusOrder(int id, StatusOrder status)
         {
